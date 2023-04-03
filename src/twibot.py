@@ -12,7 +12,7 @@ def tweet_movie(client,pelicula):
     # text= f"{pelicula['titulo']} {pelicula['link']} {pelicula['poster']}"    
     text= f"New movie uploaded!\n{pelicula['titulo']}\n{pelicula['link']}"
     print(text)
-    # print(client.create_tweet(text=text))
+    print(client.create_tweet(text=text))
 
 def delete_all_tweets(client):
     all_tweets = []
@@ -43,7 +43,7 @@ def main():
     client = init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret)
 
     url = "https://www.pelismkvhd.com/"
-    previous_last_movie_id = "post-64783"
+    previous_last_movie_id = "post-64751"
     
     while True:
         now = datetime.datetime.now().time()
