@@ -43,7 +43,7 @@ def main():
     client = init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret)
 
     url = "https://www.pelismkvhd.com/"
-    previous_last_movie_id = "post-64751"
+    previous_last_movie_id = get_peliculas(url)[0]['id']
     
     while True:
         now = datetime.datetime.now().time()
@@ -61,11 +61,11 @@ def main():
             
             previous_last_movie_id = last_movie['id'] 
         else:
-            print(f"Not in active time: {now}")
+            print(f"{now}: Not in active time")
             time.sleep(3600)
 
         print()
-        print("Sleeping...")
+        print(f"{now}: Sleeping...")
         time.sleep(300)
         print()
     
