@@ -5,7 +5,7 @@ from creds import api_key, api_secret_key, access_token, access_token_secret, be
 
 def init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret):
     client = tweepy.Client(bearer, api_key, api_secret_key, access_token, access_token_secret, return_type=dict)
-    # print(client.get_me())
+    print(f"Logged in as: {client.get_me()}")
     return client
 
 def tweet_movie(client,pelicula):        
@@ -39,16 +39,25 @@ def get_peliculas(url):
     return peliculas_parsed
 
 def main():
-    
-    client = init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret)
-
     url = "https://www.pelismkvhd.com/"
     
+    print("Welcome to PelisMega Bot!")
+    print("We tweet every time there's a new movie")
+    client = init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret)
+    
+    client.create_tweet(text=f"""I've restarted!
+                        I dont persist so maybe check if you missed anything in the meantime
+                        {url}
+                        """
+                        )
+        
+    print()
     last_movie = get_peliculas(url)[0]
     previous_last_movie_id = last_movie['id']
     # previous_last_movie_id = "post-64844"
     
     print(f"Last movie is {last_movie}")
+    print()
     print("Not tweeting this one")
     print(f"Check yourself at {url}")
     print()
