@@ -45,10 +45,9 @@ def main():
     print("We tweet every time there's a new movie")
     client = init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret)
     
-    client.create_tweet(text=f"""I've restarted!
-                        I dont persist so maybe check if you missed anything in the meantime
-                        {url}
-                        """
+    client.create_tweet(text=f"""I've restarted at {datetime.datetime.now().time()}!
+I dont persist so maybe check if you missed anything from last update
+                        {url}"""
                         )
         
     print()
@@ -72,9 +71,10 @@ def main():
             
             try:
                 peliculas = get_peliculas(url)
-            except ConnectionError:
+            except requests.exceptions.ConnectionError:
                 print(f"{now}: ERROR: Connection Error due to no Wifi")
                 print(f"{now}: Sleeping extra to reconnect...")
+                print()
                 time.sleep(3000)
                 continue
             
@@ -86,7 +86,7 @@ def main():
             previous_last_movie_id = last_movie['id'] 
         else:
             print(f"{now}: Not in active time")
-            time.sleep(3600)
+            time.sleep(1800)
 
         print()
         print(f"{now}: Sleeping...")
