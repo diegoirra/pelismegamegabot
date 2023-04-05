@@ -43,7 +43,15 @@ def main():
     client = init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret)
 
     url = "https://www.pelismkvhd.com/"
-    previous_last_movie_id = get_peliculas(url)[0]['id']
+    
+    last_movie = get_peliculas(url)[0]
+    previous_last_movie_id = last_movie['id']
+    # previous_last_movie_id = "post-64844"
+    
+    print(f"Last movie is {last_movie}")
+    print("Not tweeting this one")
+    print(f"Check yourself at {url}")
+    print()
     
     while True:
         now = datetime.datetime.now().time()
@@ -52,7 +60,14 @@ def main():
         
         if start_time <= now <= end_time:
             print(f"Checking movies at {url}")
-            peliculas = get_peliculas(url)
+            
+            try:
+                peliculas = get_peliculas(url)
+            except ConnectionError:
+                print(f"{now}: ERROR: Connection Error due to no Wifi")
+                print(f"{now}: Sleeping extra to reconnect...")
+                time.sleep(3000)
+                continue
             
             last_movie=next_movie = peliculas.pop(0)        
             while next_movie['id'] != previous_last_movie_id:
