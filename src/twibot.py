@@ -28,6 +28,30 @@ def get_peliculas(url):
     soup = BeautifulSoup(response.text, "html.parser")
     
     contenido = soup.find("div", id="contenido")
+    if not contenido:
+        print("WARNING: Contenido not found.")
+        print(f"Request response: {response}")
+        print(f"Soup HTML parser: soup")
+        print(f"Contenido: {contenido}")
+        print()
+        return {}
+
+# Checking movies at https://www.pelismkvhd.com/
+# WARNING: Contenido not found.
+# Request response: <Response [502]>
+# Soup HTML parser: soup
+# Contenido: None
+#
+# Traceback (most recent call last):
+#   File "/home/d_irra/git/pelismegamegabot/src/twibot.py", line 110, in <module>
+#     main()
+#   File "/home/d_irra/git/pelismegamegabot/src/twibot.py", line 89, in main
+#     last_movie=next_movie = peliculas.pop(0)        
+# KeyError: 0
+
+
+
+   
     peliculas = contenido.find_all('div', class_='pelicula')    
     peliculas_parsed = [{ 
                 "id": pelicula_div["id"], 
