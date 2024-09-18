@@ -5,18 +5,36 @@ from creds import api_key, api_secret_key, access_token, access_token_secret, be
 
 def init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret):
     client = tweepy.Client(bearer, api_key, api_secret_key, access_token, access_token_secret, return_type=dict)
-    print(f"Logged in as: {client.get_me()}")
+    print(f"Logged in as: {client.get_me()['data']}")
     return client
 
+def init_api():
+    auth = tweepy.OAuthHandler(consumer_key=api_key, consumer_secret=api_secret_key)
+    auth.set_access_token(key=access_token, secret=access_token_secret)
+    return tweepy.API(auth)    
+
+def upload_poster(pelicula):
+    api = init_api()    
+    
+    #def download_poster ?
+    response = requests.get(pelicula['poster'])
+    with open("poster.png", "wb") as file:
+        file.write(response.content)    
+    
+    media = api.media_upload("poster.png")    
+    print("Uploaded poster as:", media)
+    return media.media_id
+
 def tweet_movie(client,pelicula):        
-    # text= f"{pelicula['titulo']} {pelicula['link']} {pelicula['poster']}"    
-    text= f"New movie uploaded!\n{pelicula['titulo']}\n{pelicula['link']}"
-    print(text)
-    print(client.create_tweet(text=text))
+    text= f"""New movie uploaded!\n{pelicula['titulo']}\n{pelicula['link']}"""
+    poster_id = upload_poster(pelicula)
+    print(text)    
+    print("Tweeted succesfully: ", client.create_tweet(text=text, media_ids=[poster_id]))
+    
 
 def delete_all_tweets(client):
     all_tweets = []
-    me_id = client.get_me()['id']
+    me_id = client.get_me()['data']['id']
     for tweet in tweepy.Cursor(client.get_users_tweets(me_id)).items():
         all_tweets.append(tweet)
     for tweet in all_tweets:
@@ -49,9 +67,6 @@ def get_peliculas(url):
 #     last_movie=next_movie = peliculas.pop(0)        
 # KeyError: 0
 
-
-
-   
     peliculas = contenido.find_all('div', class_='pelicula')    
     peliculas_parsed = [{ 
                 "id": pelicula_div["id"], 
@@ -67,18 +82,19 @@ def main():
     
     print("Welcome to PelisMega Bot!")
     print("We tweet every time there's a new movie")
-    client = init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret)
-    
+    client = init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret)      
     client.create_tweet(text=f"""I've restarted at {datetime.datetime.now().time()}!
 I dont persist so maybe check if you missed anything from last update
-                        {url}"""
+                        {url}""",
                         )
         
     print()
     last_movie = get_peliculas(url)[0]
     previous_last_movie_id = last_movie['id']
-    # previous_last_movie_id = "post-64844"
     
+    # delete_all_tweets(client)
+    # tweet_movie(client, last_movie)
+
     print(f"Last movie is {last_movie}")
     print()
     print("Not tweeting this one")
