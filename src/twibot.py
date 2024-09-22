@@ -101,7 +101,7 @@ I dont persist so maybe check if you missed anything from last update
     previous_last_movie_id = last_movie['id']
     
     # delete_all_tweets(client)
-    tweet_movie(client, last_movie)
+    # tweet_movie(client, last_movie)
 
     print(f"Last movie is {last_movie}")
     print()
