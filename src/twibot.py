@@ -13,11 +13,27 @@ def init_api():
     auth.set_access_token(key=access_token, secret=access_token_secret)
     return tweepy.API(auth)    
 
-def upload_poster(pelicula):
+def get_movie_poster(url):
+    response = requests.get(url)    
+    soup = BeautifulSoup(response.text, "html.parser")
+    
+    print("Getting HD movie poster from ", url)
+    poster = soup.find("img", id="poster")
+    if not poster:
+        print("WARNING: Poster not found.")
+        return ""
+
+    print(f"Poster: {poster}")
+    print()
+    poster_hd = poster['data-lazy-src']
+    return poster_hd
+    
+
+def upload_poster(poster):
     api = init_api()    
     
     #def download_poster ?
-    response = requests.get(pelicula['poster'])
+    response = requests.get(poster)
     with open("poster.png", "wb") as file:
         file.write(response.content)    
     
@@ -27,9 +43,14 @@ def upload_poster(pelicula):
 
 def tweet_movie(client,pelicula):        
     text= f"""New movie uploaded!\n{pelicula['titulo']}\n{pelicula['link']}"""
-    poster_id = upload_poster(pelicula)
+
+    hd_poster = get_movie_poster(pelicula['link'])
+    if hd_poster:
+        poster_id = upload_poster(hd_poster)
+        print("Tweeted succesfully: ", client.create_tweet(text=text, media_ids=[poster_id]))
+    else:
+        print("Tweeted succesfully: ", client.create_tweet(text=text))
     print(text)    
-    print("Tweeted succesfully: ", client.create_tweet(text=text, media_ids=[poster_id]))
     
 
 def delete_all_tweets(client):
@@ -53,19 +74,6 @@ def get_peliculas(url):
         print(f"Contenido: {contenido}")
         print()
         return {}
-
-# Checking movies at https://www.pelismkvhd.com/
-# WARNING: Contenido not found.
-# Request response: <Response [502]>
-# Soup HTML parser: soup
-# Contenido: None
-#
-# Traceback (most recent call last):
-#   File "/home/d_irra/git/pelismegamegabot/src/twibot.py", line 110, in <module>
-#     main()
-#   File "/home/d_irra/git/pelismegamegabot/src/twibot.py", line 89, in main
-#     last_movie=next_movie = peliculas.pop(0)        
-# KeyError: 0
 
     peliculas = contenido.find_all('div', class_='pelicula')    
     peliculas_parsed = [{ 
@@ -93,7 +101,7 @@ I dont persist so maybe check if you missed anything from last update
     previous_last_movie_id = last_movie['id']
     
     # delete_all_tweets(client)
-    # tweet_movie(client, last_movie)
+    tweet_movie(client, last_movie)
 
     print(f"Last movie is {last_movie}")
     print()
@@ -118,7 +126,8 @@ I dont persist so maybe check if you missed anything from last update
                 time.sleep(3000)
                 continue
             
-            last_movie=next_movie = peliculas.pop(0)        
+            if peliculas:
+                last_movie=next_movie = peliculas.pop(0)        
             while next_movie['id'] != previous_last_movie_id:
                 tweet_movie(client, next_movie)
                 next_movie = peliculas.pop(0)           
