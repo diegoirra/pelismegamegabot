@@ -78,8 +78,7 @@ def get_peliculas(url):
     peliculas = contenido.find_all('div', class_='pelicula')    
     peliculas_parsed = [{ 
                 "id": pelicula_div["id"], 
-                "titulo": pelicula_div.find("h2").a["title"],
-                "poster": pelicula_div.find("div", class_="poster marco-sinopsis").a.img["data-lazy-src"],
+                "titulo": pelicula_div.find("h2").a["title"],                
                 "link": pelicula_div.find("div", class_="poster marco-sinopsis").a["href"]  
             } for pelicula_div in peliculas]
     
