@@ -25,7 +25,7 @@ def get_movie_poster(url):
 
     print(f"Poster: {poster}")
     print()
-    poster_hd = poster['data-lazy-src']
+    poster_hd = poster['src']
     return poster_hd
     
 
@@ -89,7 +89,8 @@ def main():
     
     print("Welcome to PelisMega Bot!")
     print("We tweet every time there's a new movie")
-    client = init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret)      
+    client = init_twitter(bearer, api_key, api_secret_key, access_token, access_token_secret)
+    time.sleep(2)
     client.create_tweet(text=f"""I've restarted at {datetime.datetime.now().time()}!
 I dont persist so maybe check if you missed anything from last update
                         {url}""",
